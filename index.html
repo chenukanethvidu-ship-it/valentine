@@ -119,25 +119,29 @@
     <button onclick="next()">Okay 👀</button>
   </div>
 
-  <!-- STEP 2: Mini-game immediately after "Lowkey missed texting" -->
+  <!-- STEP 2: Just message -->
   <div class="card hidden" id="step2">
-    <h2>Lowkey missed you 😇</h2>
     <p>Lowkey missed texting you and that’s why I am here making this website</p>
-    <p class="game-caption">I don’t wanna make it boring for you, so let’s play this game! 🌈</p>
-    <div class="game-board" id="gameBoard"></div>
-    <button id="gameNext" class="hidden" onclick="showQuestion()">Next ⬇️</button>
+    <button onclick="nextGame()">Next ⬇️</button>
   </div>
 
-  <!-- STEP 3: Valentine Question -->
+  <!-- STEP 3: Mini-game -->
   <div class="card hidden" id="step3">
+    <p class="game-caption">I don’t wanna make it boring for you, so let’s play this game! 🌈</p>
+    <div class="game-board" id="gameBoard"></div>
+    <button id="gameNext" class="hidden" onclick="showQuestion()">Done!</button>
+  </div>
+
+  <!-- STEP 4: Valentine Question -->
+  <div class="card hidden" id="step4">
     <h2>Since no one ever asked you this…</h2>
     <p>Can I be your Valentine, gammata? 😏</p>
     <button id="yesBtn" onclick="yesClicked()">YES 💖</button><br>
     <button class="no-btn" onclick="noClicked()">NO 😒</button>
   </div>
 
-  <!-- STEP 4: Final YAY Slide -->
-  <div class="card hidden" id="step4">
+  <!-- STEP 5: Final YAY -->
+  <div class="card hidden" id="step5">
     <h2>YAYYY 🎉💗</h2>
     <p>
       I don’t need a special day to love you, but I’ll use this one to do it louder 💖  
@@ -155,6 +159,11 @@
       step1.classList.add("hidden");
       step2.classList.remove("hidden");
       music.play();
+    }
+
+    function nextGame() {
+      step2.classList.add("hidden");
+      step3.classList.remove("hidden");
       setupGame();
     }
 
@@ -165,13 +174,13 @@
     }
 
     function yesClicked() {
-      step3.classList.add("hidden");
-      step4.classList.remove("hidden");
+      step4.classList.add("hidden");
+      step5.classList.remove("hidden");
     }
 
     function showQuestion() {
-      step2.classList.add("hidden");
-      step3.classList.remove("hidden");
+      step3.classList.add("hidden");
+      step4.classList.remove("hidden");
     }
 
     // Drag & Drop Game Setup
@@ -237,7 +246,6 @@
       }
     }
 
-    // Heart + confetti animation when game finishes
     function animateHearts(){
       const board = document.getElementById("gameBoard");
       for(let i=0; i<30; i++){
