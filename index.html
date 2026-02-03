@@ -98,6 +98,11 @@
     .flower-box {
       background: rgba(255,255,255,0.2);
     }
+
+    .game-caption {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -114,31 +119,25 @@
     <button onclick="next()">Okay 👀</button>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- STEP 2: Mini-game immediately after "Lowkey missed texting" -->
   <div class="card hidden" id="step2">
     <h2>Lowkey missed you 😇</h2>
     <p>Lowkey missed texting you and that’s why I am here making this website</p>
-    <button onclick="next2()">Go on 🙈</button>
+    <p class="game-caption">I don’t wanna make it boring for you, so let’s play this game! 🌈</p>
+    <div class="game-board" id="gameBoard"></div>
+    <button id="gameNext" class="hidden" onclick="showQuestion()">Next ⬇️</button>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- STEP 3: Valentine Question -->
   <div class="card hidden" id="step3">
     <h2>Since no one ever asked you this…</h2>
     <p>Can I be your Valentine, gammata? 😏</p>
     <button id="yesBtn" onclick="yesClicked()">YES 💖</button><br>
-    <button class="no-btn" onclick="nextGame()">Maybe later 😅</button>
+    <button class="no-btn" onclick="noClicked()">NO 😒</button>
   </div>
 
-  <!-- STEP 4 (Drag & Drop game) -->
+  <!-- STEP 4: Final YAY Slide -->
   <div class="card hidden" id="step4">
-    <h2>Match the colors to the flowers 🌸</h2>
-    <p>Drag each color box onto the flower it matches! 🌈</p>
-    <div class="game-board" id="gameBoard"></div>
-    <button id="gameNext" class="hidden" onclick="finishGame()">Done!</button>
-  </div>
-
-  <!-- STEP 5 -->
-  <div class="card hidden" id="step5">
     <h2>YAYYY 🎉💗</h2>
     <p>
       I don’t need a special day to love you, but I’ll use this one to do it louder 💖  
@@ -156,22 +155,23 @@
       step1.classList.add("hidden");
       step2.classList.remove("hidden");
       music.play();
+      setupGame();
     }
 
-    function next2() {
-      step2.classList.add("hidden");
-      step3.classList.remove("hidden");
-    }
-
-    function yesClicked() {
-      yesSize += 0.2;
+    // YES button grows when NO clicked
+    function noClicked() {
+      yesSize += 0.3;
       yesBtn.style.transform = `scale(${yesSize})`;
     }
 
-    function nextGame() {
+    function yesClicked() {
       step3.classList.add("hidden");
       step4.classList.remove("hidden");
-      setupGame();
+    }
+
+    function showQuestion() {
+      step2.classList.add("hidden");
+      step3.classList.remove("hidden");
     }
 
     // Drag & Drop Game Setup
@@ -249,7 +249,6 @@
         heart.style.fontSize = (15 + Math.random()*25) + "px";
         document.body.appendChild(heart);
 
-        // Animate upward
         let top = board.offsetTop + Math.random()*50;
         const interval = setInterval(()=>{
           top -= 3 + Math.random()*3;
@@ -261,11 +260,6 @@
         },30);
       }
       setTimeout(()=>{ document.getElementById("gameNext").classList.remove("hidden"); }, 1000);
-    }
-
-    function finishGame() {
-      step4.classList.add("hidden");
-      step5.classList.remove("hidden");
     }
 
     // Floating hearts
