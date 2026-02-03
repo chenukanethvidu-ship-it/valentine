@@ -19,28 +19,35 @@
 
     .card {
       background: rgba(255,255,255,0.25);
-      padding: 30px;
+      padding: 40px;
       border-radius: 22px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.25);
-      max-width: 360px;
+      max-width: 450px;
       z-index: 2;
+      font-size: 22px;
+      font-weight: bold;
+      line-height: 1.5;
     }
 
     button {
-      margin-top: 15px;
-      padding: 12px 25px;
-      font-size: 16px;
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 20px;
+      font-weight: bold;
       border: none;
       border-radius: 30px;
       cursor: pointer;
       background: #ff4d6d;
       color: white;
+      transition: all 0.3s ease;
     }
 
     .no-btn {
       background: #ffffffaa;
       color: #ff4d6d;
       position: relative;
+      font-size: 18px;
+      font-weight: bold;
     }
 
     .hidden {
@@ -57,14 +64,39 @@
     }
 
     @keyframes floatUp {
-      from {
-        transform: translateY(0);
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-120vh);
-        opacity: 0;
-      }
+      from { transform: translateY(0); opacity:1;}
+      to { transform: translateY(-120vh); opacity:0;}
+    }
+
+    /* Drag & drop game styles */
+    .game-board {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .color-box, .flower-box {
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .color-box:hover, .flower-box:hover {
+      transform: scale(1.1);
+    }
+
+    .flower-box {
+      background: rgba(255,255,255,0.2);
     }
   </style>
 </head>
@@ -78,33 +110,35 @@
   <!-- STEP 1 -->
   <div class="card" id="step1">
     <h2>Hey Sanuuu 💕</h2>
-    <p>
-      So I made this to askk you something… 💌
-    </p>
+    <p>So I made this to askk you something… 💌</p>
     <button onclick="next()">Okay 👀</button>
   </div>
 
   <!-- STEP 2 -->
   <div class="card hidden" id="step2">
     <h2>Lowkey missed you 😇</h2>
-    <p>
-      Lowkey missed texting you and that’s why I am here making this website
-    </p>
+    <p>Lowkey missed texting you and that’s why I am here making this website</p>
     <button onclick="next2()">Go on 🙈</button>
   </div>
 
   <!-- STEP 3 -->
   <div class="card hidden" id="step3">
     <h2>Since no one ever asked you this…</h2>
-    <p>
-      Can I be your Valentine, gammata? 😏
-    </p>
-    <button onclick="yes()">YES 💖</button><br>
-    <button class="no-btn" onmouseover="runAway(this)">No 😒</button>
+    <p>Can I be your Valentine, gammata? 😏</p>
+    <button id="yesBtn" onclick="yesClicked()">YES 💖</button><br>
+    <button class="no-btn" onclick="nextGame()">Maybe later 😅</button>
   </div>
 
-  <!-- STEP 4 -->
+  <!-- STEP 4 (Drag & Drop game) -->
   <div class="card hidden" id="step4">
+    <h2>Match the colors to the flowers 🌸</h2>
+    <p>Drag each color box onto the flower it matches! 🌈</p>
+    <div class="game-board" id="gameBoard"></div>
+    <button id="gameNext" class="hidden" onclick="finishGame()">Done!</button>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="card hidden" id="step5">
     <h2>YAYYY 🎉💗</h2>
     <p>
       I don’t need a special day to love you, but I’ll use this one to do it louder 💖  
@@ -115,6 +149,8 @@
 
   <script>
     const music = document.getElementById("music");
+    let yesBtn = document.getElementById("yesBtn");
+    let yesSize = 1;
 
     function next() {
       step1.classList.add("hidden");
@@ -127,18 +163,112 @@
       step3.classList.remove("hidden");
     }
 
-    function yes() {
+    function yesClicked() {
+      yesSize += 0.2;
+      yesBtn.style.transform = `scale(${yesSize})`;
+    }
+
+    function nextGame() {
       step3.classList.add("hidden");
       step4.classList.remove("hidden");
+      setupGame();
     }
 
-    function runAway(btn) {
-      const x = Math.random() * 200 - 100;
-      const y = Math.random() * 200 - 100;
-      btn.style.transform = `translate(${x}px, ${y}px)`;
+    // Drag & Drop Game Setup
+    const colors = [
+      {color:"#ff4d6d", flower:"💐"},
+      {color:"#fdd835", flower:"🌻"},
+      {color:"#4db6ac", flower:"🌷"},
+      {color:"#ba68c8", flower:"🌸"}
+    ];
+
+    function setupGame() {
+      const board = document.getElementById("gameBoard");
+      board.innerHTML = "";
+      document.getElementById("gameNext").classList.add("hidden");
+
+      colors.forEach((item, i) => {
+        const colorBox = document.createElement("div");
+        colorBox.className = "color-box";
+        colorBox.style.background = item.color;
+        colorBox.draggable = true;
+        colorBox.id = "color"+i;
+
+        colorBox.addEventListener("dragstart", (e)=>{
+          e.dataTransfer.setData("text", colorBox.id);
+        });
+
+        board.appendChild(colorBox);
+      });
+
+      colors.forEach((item, i) => {
+        const flowerBox = document.createElement("div");
+        flowerBox.className = "flower-box";
+        flowerBox.innerText = item.flower;
+        flowerBox.id = "flower"+i;
+
+        flowerBox.addEventListener("dragover", (e)=>{
+          e.preventDefault();
+        });
+
+        flowerBox.addEventListener("drop", (e)=>{
+          e.preventDefault();
+          const colorId = e.dataTransfer.getData("text");
+          const colorIndex = parseInt(colorId.replace("color",""));
+          if(colorIndex === i){
+            flowerBox.style.background = colors[i].color;
+            flowerBox.style.color = "#fff";
+            flowerBox.style.fontSize = "36px";
+            document.getElementById(colorId).style.display="none";
+            checkGameCompletion();
+          } else {
+            alert("Oops, try again! 😅");
+          }
+        });
+
+        board.appendChild(flowerBox);
+      });
     }
 
-    // Create floating hearts
+    function checkGameCompletion(){
+      const hiddenColors = Array.from(document.querySelectorAll(".color-box")).filter(c => c.style.display==="none");
+      if(hiddenColors.length === colors.length){
+        animateHearts();
+      }
+    }
+
+    // Heart + confetti animation when game finishes
+    function animateHearts(){
+      const board = document.getElementById("gameBoard");
+      for(let i=0; i<30; i++){
+        const heart = document.createElement("div");
+        heart.innerText = i%2===0 ? "💗" : "🎉";
+        heart.style.position = "absolute";
+        heart.style.left = (board.offsetLeft + Math.random()*board.offsetWidth) + "px";
+        heart.style.top = (board.offsetTop + Math.random()*board.offsetHeight) + "px";
+        heart.style.fontSize = (15 + Math.random()*25) + "px";
+        document.body.appendChild(heart);
+
+        // Animate upward
+        let top = board.offsetTop + Math.random()*50;
+        const interval = setInterval(()=>{
+          top -= 3 + Math.random()*3;
+          heart.style.top = top + "px";
+          if(top < -50){ 
+            heart.remove(); 
+            clearInterval(interval); 
+          }
+        },30);
+      }
+      setTimeout(()=>{ document.getElementById("gameNext").classList.remove("hidden"); }, 1000);
+    }
+
+    function finishGame() {
+      step4.classList.add("hidden");
+      step5.classList.remove("hidden");
+    }
+
+    // Floating hearts
     setInterval(() => {
       const heart = document.createElement("div");
       heart.classList.add("heart");
@@ -146,10 +276,7 @@
       heart.style.left = Math.random() * 100 + "vw";
       heart.style.fontSize = Math.random() * 20 + 15 + "px";
       document.body.appendChild(heart);
-
-      setTimeout(() => {
-        heart.remove();
-      }, 6000);
+      setTimeout(() => { heart.remove(); }, 6000);
     }, 500);
   </script>
 
